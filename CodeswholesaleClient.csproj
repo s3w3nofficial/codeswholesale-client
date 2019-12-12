@@ -12,6 +12,7 @@
     <PackageTags>CodeswholesaleClient</PackageTags>
     <PackageId>CodeswholesaleClient.Net</PackageId>
     <Product>CodeswholesaleClient.Net</Product>
+    <PackageIconUrl>https://github.com/s3w3nofficial/codeswholesale-client-dotnet/blob/master/art/icon.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
