@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CodeswholesaleClient
 {
-    //variables constructors
+    #region variables constructors
     public partial class Client
     {
         HttpClient client;
@@ -25,8 +25,9 @@ namespace CodeswholesaleClient
                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.Result.AccessToken);
         }
     }
+    #endregion
 
-    //GET
+    #region GET
     public partial class Client
     {
         public async Task<IEnumerable<ProductsResponse>> GetProductsAsync()
@@ -62,8 +63,9 @@ namespace CodeswholesaleClient
             catch { return null; }
         }
     }
+    #endregion
 
-    //POST
+    #region POST
     public partial class Client
     {
         public async Task<TokenResponse> GetTokenAsync(TokenRequest request)
@@ -88,5 +90,6 @@ namespace CodeswholesaleClient
                 return JObject.Parse(await resp.Content.ReadAsStringAsync()).ToObject<BuyProductResponse>();
             return null;
         }
+        #endregion
     }
 }

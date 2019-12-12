@@ -1,15 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Tomáš Pelák</Authors>
+    <Description>.net standard client for Codeswholesale api</Description>
+    <Copyright>Tomáš Pelák 2019</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/s3w3nofficial/codeswholesale-client</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/s3w3nofficial/codeswholesale-client</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>CodeswholesaleClient</PackageTags>
+    <PackageId>CodeswholesaleClient.Net</PackageId>
+    <Product>CodeswholesaleClient.Net</Product>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Aukro\Aukro.csproj" />
   </ItemGroup>
 
 </Project>
