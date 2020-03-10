@@ -6,10 +6,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeswholesaleClient
 {
+    public class RetryHandler : DelegatingHandler
+    {
+        private const int _MAXRETRIES = 3;
+
+        public RetryHandler(HttpMessageHandler innerHandler)
+            : base(innerHandler)
+        { }
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            HttpResponseMessage response = null;
+            for (int i = 0; i < _MAXRETRIES; i++)
+            {
+                response = await base.SendAsync(request, cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    return response;
+                }
+            }
+
+            return response;
+        }
+    }
+
     #region variables constructors
     public partial class Client
     {
@@ -17,7 +44,7 @@ namespace CodeswholesaleClient
 
         public Client(Uri endpoint, string client_id, string client_secret)
         {
-            client = new HttpClient();
+            client = new HttpClient(new RetryHandler(new HttpClientHandler()));
             client.BaseAddress = endpoint;
             var token = GetTokenAsync(new TokenRequest() { GrantType = "client_credentials", ClientId = client_id, ClientSecret = client_secret });
             token.Wait();
