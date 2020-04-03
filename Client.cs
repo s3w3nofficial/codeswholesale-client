@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace CodeswholesaleClient
 {
+    #region retryhandler
     public class RetryHandler : DelegatingHandler
     {
         private const int _MAXRETRIES = 3;
@@ -36,6 +37,7 @@ namespace CodeswholesaleClient
             return response;
         }
     }
+    #endregion
 
     #region variables constructors
     public partial class Client
@@ -51,9 +53,25 @@ namespace CodeswholesaleClient
             if (token.Result != null)
                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.Result.AccessToken);
         }
+
+        public async Task<TokenResponse> GetTokenAsync(TokenRequest request)
+        {
+            try
+            {
+                var data = JObject.Parse(JsonConvert.SerializeObject(request).ToString()).ToObject<Dictionary<string, string>>();
+                var encodedData = new FormUrlEncodedContent(data);
+                var encodedDataString = await encodedData.ReadAsStringAsync();
+                var resp = await client.PostAsync("/oauth/token", new StringContent(encodedDataString, Encoding.UTF8, "application/x-www-form-urlencoded"));
+                if (resp.IsSuccessStatusCode)
+                    return JObject.Parse(await resp.Content.ReadAsStringAsync()).ToObject<TokenResponse>();
+                return null;
+            }
+            catch { return null; }
+        }
     }
     #endregion
 
+    #region V1
     #region GET
     public partial class Client
     {
@@ -95,20 +113,6 @@ namespace CodeswholesaleClient
     #region POST
     public partial class Client
     {
-        public async Task<TokenResponse> GetTokenAsync(TokenRequest request)
-        {
-            try
-            {
-                var data = JObject.Parse(JsonConvert.SerializeObject(request).ToString()).ToObject<Dictionary<string, string>>();
-                var encodedData = new FormUrlEncodedContent(data);
-                var encodedDataString = await encodedData.ReadAsStringAsync();
-                var resp = await client.PostAsync("/oauth/token", new StringContent(encodedDataString, Encoding.UTF8, "application/x-www-form-urlencoded"));
-                if (resp.IsSuccessStatusCode)
-                    return JObject.Parse(await resp.Content.ReadAsStringAsync()).ToObject<TokenResponse>();
-                return null;
-            }
-            catch { return null; }
-        }
 
         public async Task<BuyProductResponse> BuyProductAsync(string productId)
         {
@@ -117,6 +121,36 @@ namespace CodeswholesaleClient
                 return JObject.Parse(await resp.Content.ReadAsStringAsync()).ToObject<BuyProductResponse>();
             return null;
         }
-        #endregion
     }
+    #endregion
+    #endregion
+
+    #region V2
+    #region Get
+    public partial class Client
+    {
+        public async Task<OrderResponse> GetOrderById(string orderId)
+        {
+            var resp = await client.GetAsync($"/v2/orders/{orderId}");
+            if (resp.IsSuccessStatusCode)
+                return JObject.Parse(await resp.Content.ReadAsStringAsync()).ToObject<OrderResponse>();
+            return null;
+        }
+    }
+    #endregion
+
+    #region Post
+    public partial class Client
+    {
+        public async Task<OrderResponse> PostOrderAsync(OrderRequest request)
+        {
+            var data = JsonConvert.SerializeObject(request).ToString();
+            var resp = await client.PostAsync($"/v2/orders", new StringContent(data, Encoding.UTF8, "application/json"));
+            if (resp.IsSuccessStatusCode)
+                return JObject.Parse(await resp.Content.ReadAsStringAsync()).ToObject<OrderResponse>();
+            return null;
+        }
+    }
+    #endregion
+    #endregion
 }
